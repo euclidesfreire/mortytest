@@ -1,1 +1,1 @@
-__all__ = ['sorting', 'tests']
+__all__ = ['morty']
