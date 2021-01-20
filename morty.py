@@ -18,7 +18,7 @@ def sum_data_date(df):
     df_new = pd.DataFrame(data = df_tmp, 
                   columns = ['state', 'date', 'new_confirmed', 'new_deaths'])
     
-    df_new.to_csv('data/sumdatadate/caso_full_new.csv')
+    df_new.to_csv('datasets/sumdatadate/caso_full_new.csv')
 
     return df_new
 
