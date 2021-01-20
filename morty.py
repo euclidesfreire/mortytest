@@ -28,8 +28,8 @@ def delete_isnull_city(df):
     
     return df_no_city_null
 
-def heatmap(df):
+def heatmap(df, titleCor):
     dfCor = df.corr()
-    outcomeCor = abs(dfCor['new_confirmed'])
+    outcomeCor = abs(dfCor[titleCor])
     plt.figure(figsize=(10,8))
     sns.heatmap(dfCor,cmap='rocket_r',annot=True)
