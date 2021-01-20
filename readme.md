@@ -5,6 +5,10 @@ Introdução
 ------------
 *  Aplicação da Lei de Benford para Análise de Casos de COVID-19 no Brasil. TCC - Engenharia de Computação - UEMA - 2020.2.
 
+Estrutura:
+-----------
+* morty.py - Contém funções gerais
+* test.ipynb - Contém os testes dos datasets pela benfordslaw
 
 Tecnologias utilizadas:
 -----------------------
