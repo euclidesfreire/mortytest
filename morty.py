@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import math
 from scipy.stats import chisquare
-from benfordslaw import benfordslaw
 
 def sum_data_date(df):
     df_aux = df
     df_tmp = []
+   
     for state in df_aux['state'].unique():
         Iloc = df_aux['state']==state
+        
         for date in df_aux['date'].loc[Iloc].unique():
             new_confirmed_aux = df_aux['new_confirmed'].loc[df_aux['date']==date].sum()
             new_deaths_aux = df_aux['new_deaths'].loc[df_aux['date']==date].sum()
@@ -23,6 +24,62 @@ def sum_data_date(df):
     df_new.to_csv('datasets/sumdatadate/caso_full_new.csv')
 
     return df_new
+
+def all_estados_br(df, bl, N_string,path, titulo):
+    """
+    df = dataset 
+    N_string = nome da coluna de dados a ser testado
+    bl = função de benford
+    path = caminho para salvar plot
+    titulo = titulo do gráfico 
+    """
+
+    for state in df['state'].unique():
+        Iloc = df['state']==state
+        X = df[N_string].loc[Iloc].values
+        result = bl.fit(X)
+        title= titulo + " - Estado: " + state 
+        make_plot(bl, path+N_string+'-'+state, title)
+
+#função de plot em Pt-BR da função de benford
+def make_plot(bl, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8)):
+        
+    data_percentage = bl.results['percentage_emp']
+    x = data_percentage[:, 0]
+    # Make figures
+    fig, ax = plt.subplots(figsize=figsize)
+    # Plot Empirical percentages
+    rects1 = ax.bar(x, data_percentage[:, 1], width=barwidth, color=barcolor, alpha=0.8, label='Distribuição Empírica')
+    plt.plot(x, data_percentage[:, 1], color='black', linewidth=0.8)
+    # ax.scatter(x, data_percentage, s=150, c='red', zorder=2)
+    # attach a text label above each bar displaying its height
+    for rect in rects1:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width() / 2, height, '{:0.1f}'.format(height), ha='center', va='bottom', fontsize=13)
+    # Plot expected benfords values
+    ax.scatter(x, bl.leading_digits, s=150, c='red', zorder=2, label='Distribuição de Benford')
+    # ax.bar(x + width, BENFORDLD, width=width, color='blue', alpha=0.8, label='Benfords distribution')
+    # plt.plot(x + width, BENFORDLD, color='blue', linewidth=0.8)
+    if bl.results['P']<=bl.alpha:
+        title = title + "\nAnomalia detectada! P=%g, Tstat=%g" %(bl.results['P'], bl.results['t'])
+    else:
+        title = title + "\nNenhuma anomalia detectada. P=%g, Tstat=%g" %(bl.results['P'], bl.results['t'])
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    fig.canvas.set_window_title('Porcentagem dos Primeiros Dígitos')
+    ax.set_title(title, fontsize=fontsize)
+    ax.set_ylabel('Frequência (%)', fontsize=fontsize)
+    ax.set_xlabel('Dígitos', fontsize=fontsize)
+    ax.set_xticks(x)
+    ax.set_xticklabels(x, fontsize=fontsize)
+    ax.grid(True)
+    ax.legend()
+    # Hide the right and top spines & add legend
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.legend(prop={'size': 15}, frameon=False)
+    plt.savefig(path, format='jpg')
+    plt.show()
+         
 
 def delete_isnull_city(df):
     df_no_city_null = df
@@ -172,8 +229,6 @@ class teste:
         ax.spines['top'].set_visible(False)
 
         ax.legend(prop={'size':15}, frameon=False)
-
-
 
         plt.show()
 
