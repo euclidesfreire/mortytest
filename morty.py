@@ -5,17 +5,26 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import math
 from scipy.stats import chisquare
+from benfordslaw import benfordslaw
 
 class Morty:
 
-    def __init__(self, df, bl):
+    def __init__(self, df):
         """
         df = dataset 
         bl = function benfords law 
         """
 
         self.df = df
-        self.bl = bl
+        self.bl = benfordslaw(alpha=0.5)
+    
+    def benford(self, column_name, title, path):
+        #New Deaths / benford
+        X = df[column_name].values
+
+        result = bl.fit(X)
+
+        self.make_plot(path, title)
 
     def sum_data_date(self, name, path):
         df_aux = self.df
@@ -41,7 +50,7 @@ class Morty:
 
         return df_new
 
-    def all_estados_br(self, N_string, title, path):
+    def all_estados_br(self, column_name, title, path):
         df = self.df
         bl = self.bl
         state_aux = 'state'
@@ -50,22 +59,22 @@ class Morty:
            
             Iloc = df[state_aux]==state
            
-            X = df[N_string].loc[Iloc].values
+            X = df[column_name].loc[Iloc].values
            
             result = bl.fit(X)
            
             t = title + " - Estado: " + state 
            
-            self.make_plot(path+N_string+'-'+state, t)
+            self.make_plot(path+column_name+'-'+state, t)
 
-    def por_periodo(self, N_string, title, time_start, time_stop, path):
+    def por_periodo(self, column_name, title, time_start, time_stop, path):
         df = self.df
         bl = self.bl
         date = 'date'
     
         Iloc = (df[date] >= time_start) & (df[date] <= time_stop)
     
-        X = df[N_string].loc[Iloc].values
+        X = df[column_name].loc[Iloc].values
     
         result = bl.fit(X)
     
