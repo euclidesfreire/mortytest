@@ -41,6 +41,20 @@ def all_estados_br(df, bl, N_string,path, titulo):
         title= titulo + " - Estado: " + state 
         make_plot(bl, path+N_string+'-'+state, title)
 
+def por_periodo(df, bl, N_string, title, time_start, time_stop, path):
+
+    Iloc = (df['date'] >= time_start) & (df['date'] <= time_stop)
+
+    X = df[N_string].loc[Iloc].values
+
+    result = bl.fit(X)
+
+    periodo = time_start + ':' + time_stop 
+
+    title += 'Período: ' + periodo
+
+    make_plot(bl, path+periodo, title)
+
 #função de plot em Pt-BR da função de benford
 def make_plot(bl, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8)):
         
