@@ -14,23 +14,30 @@ class Morty:
         df = dataset 
         bl = function benfords law 
         """
-        self.bl = benfordslaw(alpha=0.5)
+        self._bl = benfordslaw(alpha=0.5)
     
     def dataframe(self, df):
-        self.df = df
+        self._df = df
     
     def benford(self, column_name, title, path):
-        df = self.df
-        bl = self.bl
+        df = self._df
+        bl = self._bl
         
         X = df[column_name].values
 
         result = bl.fit(X)
 
-        self.make_plot(path, title)
+        self.make_plot(path+column_name, title)
+    
+    def _benford(self, X, name, title, path):
+        bl = self._bl
+
+        result = bl.fit(X)
+
+        self.make_plot(path+name, title)
 
     def sum_data_date(self, name, path):
-        df_aux = self.df
+        df_aux = self._df
         df_tmp = []
     
         #Unificar os dados por estado
@@ -54,8 +61,7 @@ class Morty:
         return df_new
 
     def all_estados_br(self, column_name, title, path):
-        df = self.df
-        bl = self.bl
+        df = self._df
         state_aux = 'state'
 
         for state in df[state_aux].unique():
@@ -63,40 +69,38 @@ class Morty:
             Iloc = df[state_aux]==state
            
             X = df[column_name].loc[Iloc].values
-           
-            result = bl.fit(X)
-           
+
             t = title + " - Estado: " + state 
+
+            self._benford(X, column_name, t, path)
            
-            self.make_plot(path+column_name+'-'+state, t)
 
     def por_periodo(self, column_name, title, time_start, time_stop, path):
-        df = self.df
-        bl = self.bl
+        df = self._df
         date = 'date'
     
         Iloc = (df[date] >= time_start) & (df[date] <= time_stop)
     
         X = df[column_name].loc[Iloc].values
     
-        result = bl.fit(X)
-    
         periodo = time_start + ':' + time_stop 
     
         title += 'Período: ' + periodo
-    
-        self.make_plot(path+periodo, title)
 
-    def delete_isnull_city(self):
-        df = self.df
+        self._benford(X, periodo, title, path)
 
-        df_no_city_null = df
+
+    def delete_isnull_city(self, name, title, path):
+        df_no_city_null = self._df
+
         df_no_city_null.drop(df_no_city_null[df_no_city_null.city.isnull()].index,inplace=True)
+
+        self.benford(name, title, path)
 
         return df_no_city_null
 
     def heatmap(self, titleCor):
-        df = self.df
+        df = self._df
 
         dfCor = df.corr()
 
@@ -107,7 +111,7 @@ class Morty:
 
     #função de plot em Pt-BR da função de benford
     def make_plot(self, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8)):
-        bl = self.bl
+        bl = self._bl
         data_percentage = bl.results['percentage_emp']
         x = data_percentage[:, 0]
 
@@ -148,7 +152,7 @@ class Morty:
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
         ax.legend(prop={'size': 15}, frameon=False)
-        plt.savefig(path, format='jpg')
+        plt.savefig(path, format='jpeg')
         plt.show()
 
 
