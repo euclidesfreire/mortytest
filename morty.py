@@ -6,109 +6,141 @@ import seaborn as sns
 import math
 from scipy.stats import chisquare
 
-def sum_data_date(df):
-    df_aux = df
-    df_tmp = []
-   
-    for state in df_aux['state'].unique():
-        Iloc = df_aux['state']==state
-        
-        for date in df_aux['date'].loc[Iloc].unique():
-            new_confirmed_aux = df_aux['new_confirmed'].loc[df_aux['date']==date].sum()
-            new_deaths_aux = df_aux['new_deaths'].loc[df_aux['date']==date].sum()
-            df_tmp.append([state, date, new_confirmed_aux, new_deaths_aux])
+class Morty:
+
+    def __init__(self, df, bl):
+        """
+        df = dataset 
+        bl = function benfords law 
+        """
+
+        self.df = df
+        self.bl = bl
+
+    def sum_data_date(self, name, path):
+        df_aux = self.df
+        df_tmp = []
     
-    df_new = pd.DataFrame(data = df_tmp, 
-                  columns = ['state', 'date', 'new_confirmed', 'new_deaths'])
+        #Unificar os dados por estado
+        for state in df_aux['state'].unique():
+            Iloc = df_aux['state']==state
+
+            #Unificar os dados por dia
+            for date in df_aux['date'].loc[Iloc].unique():
+                new_confirmed_aux = df_aux['new_confirmed'].loc[df_aux['date']==date].sum()
+                new_deaths_aux = df_aux['new_deaths'].loc[df_aux['date']==date].sum()
+                df_tmp.append([state, date, new_confirmed_aux, new_deaths_aux])
+
+        #Create dataset
+        df_new = pd.DataFrame(
+            data = df_tmp, 
+            columns = ['state', 'date', 'new_confirmed', 'new_deaths'])
+
+        #Create file csv 
+        df_new.to_csv(path+name+'.csv')
+
+        return df_new
+
+    def all_estados_br(self, N_string, title, path):
+        df = self.df
+        bl = self.bl
+        state_aux = 'state'
+
+        for state in df[state_aux].unique():
+           
+            Iloc = df[state_aux]==state
+           
+            X = df[N_string].loc[Iloc].values
+           
+            result = bl.fit(X)
+           
+            t = title + " - Estado: " + state 
+           
+            self.make_plot(path+N_string+'-'+state, t)
+
+    def por_periodo(self, N_string, title, time_start, time_stop, path):
+        df = self.df
+        bl = self.bl
+        date = 'date'
     
-    df_new.to_csv('datasets/sumdatadate/caso_full_new.csv')
-
-    return df_new
-
-def all_estados_br(df, bl, N_string,path, titulo):
-    """
-    df = dataset 
-    N_string = nome da coluna de dados a ser testado
-    bl = função de benford
-    path = caminho para salvar plot
-    titulo = titulo do gráfico 
-    """
-
-    for state in df['state'].unique():
-        Iloc = df['state']==state
+        Iloc = (df[date] >= time_start) & (df[date] <= time_stop)
+    
         X = df[N_string].loc[Iloc].values
-        result = bl.fit(X)
-        title= titulo + " - Estado: " + state 
-        make_plot(bl, path+N_string+'-'+state, title)
-
-def por_periodo(df, bl, N_string, title, time_start, time_stop, path):
-
-    Iloc = (df['date'] >= time_start) & (df['date'] <= time_stop)
-
-    X = df[N_string].loc[Iloc].values
-
-    result = bl.fit(X)
-
-    periodo = time_start + ':' + time_stop 
-
-    title += 'Período: ' + periodo
-
-    make_plot(bl, path+periodo, title)
-
-#função de plot em Pt-BR da função de benford
-def make_plot(bl, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8)):
-        
-    data_percentage = bl.results['percentage_emp']
-    x = data_percentage[:, 0]
-    # Make figures
-    fig, ax = plt.subplots(figsize=figsize)
-    # Plot Empirical percentages
-    rects1 = ax.bar(x, data_percentage[:, 1], width=barwidth, color=barcolor, alpha=0.8, label='Distribuição Empírica')
-    plt.plot(x, data_percentage[:, 1], color='black', linewidth=0.8)
-    # ax.scatter(x, data_percentage, s=150, c='red', zorder=2)
-    # attach a text label above each bar displaying its height
-    for rect in rects1:
-        height = rect.get_height()
-        ax.text(rect.get_x() + rect.get_width() / 2, height, '{:0.1f}'.format(height), ha='center', va='bottom', fontsize=13)
-    # Plot expected benfords values
-    ax.scatter(x, bl.leading_digits, s=150, c='red', zorder=2, label='Distribuição de Benford')
-    # ax.bar(x + width, BENFORDLD, width=width, color='blue', alpha=0.8, label='Benfords distribution')
-    # plt.plot(x + width, BENFORDLD, color='blue', linewidth=0.8)
-    if bl.results['P']<=bl.alpha:
-        title = title + "\nAnomalia detectada! P=%g, Tstat=%g" %(bl.results['P'], bl.results['t'])
-    else:
-        title = title + "\nNenhuma anomalia detectada. P=%g, Tstat=%g" %(bl.results['P'], bl.results['t'])
-    # Add some text for labels, title and custom x-axis tick labels, etc.
-    fig.canvas.set_window_title('Porcentagem dos Primeiros Dígitos')
-    ax.set_title(title, fontsize=fontsize)
-    ax.set_ylabel('Frequência (%)', fontsize=fontsize)
-    ax.set_xlabel('Dígitos', fontsize=fontsize)
-    ax.set_xticks(x)
-    ax.set_xticklabels(x, fontsize=fontsize)
-    ax.grid(True)
-    ax.legend()
-    # Hide the right and top spines & add legend
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.legend(prop={'size': 15}, frameon=False)
-    plt.savefig(path, format='jpg')
-    plt.show()
-         
-
-def delete_isnull_city(df):
-    df_no_city_null = df
-    df_no_city_null.drop(df_no_city_null[df_no_city_null.city.isnull()].index,inplace=True)
     
-    return df_no_city_null
+        result = bl.fit(X)
+    
+        periodo = time_start + ':' + time_stop 
+    
+        title += 'Período: ' + periodo
+    
+        self.make_plot(path+periodo, title)
 
-def heatmap(df, titleCor):
-    dfCor = df.corr()
-    outcomeCor = abs(dfCor[titleCor])
-    plt.figure(figsize=(10,8))
-    sns.heatmap(dfCor,cmap='rocket_r',annot=True)
+    def delete_isnull_city(self):
+        df = self.df
+
+        df_no_city_null = df
+        df_no_city_null.drop(df_no_city_null[df_no_city_null.city.isnull()].index,inplace=True)
+
+        return df_no_city_null
+
+    def heatmap(self, titleCor):
+        df = self.df
+
+        dfCor = df.corr()
+
+        outcomeCor = abs(dfCor[titleCor])
+
+        plt.figure(figsize=(10,8))
+        sns.heatmap(dfCor,cmap='rocket_r',annot=True)
+
+    #função de plot em Pt-BR da função de benford
+    def make_plot(self, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8)):
+        bl = self.bl
+        data_percentage = bl.results['percentage_emp']
+        x = data_percentage[:, 0]
+
+        # Make figures
+        fig, ax = plt.subplots(figsize=figsize)
+
+        # Plot Empirical percentages
+        rects1 = ax.bar(x, data_percentage[:, 1], width=barwidth, color=barcolor, alpha=0.8, label='Distribuição Empírica')
+        plt.plot(x, data_percentage[:, 1], color='black', linewidth=0.8)
+
+        # ax.scatter(x, data_percentage, s=150, c='red', zorder=2)
+        # attach a text label above each bar displaying its height
+        for rect in rects1:
+            height = rect.get_height()
+            ax.text(rect.get_x() + rect.get_width() / 2, height, '{:0.1f}'.format(height), ha='center', va='bottom', fontsize=13)
+        
+        # Plot expected benfords values
+        ax.scatter(x, bl.leading_digits, s=150, c='red', zorder=2, label='Distribuição de Benford')
+       
+        # ax.bar(x + width, BENFORDLD, width=width, color='blue', alpha=0.8, label='Benfords distribution')
+        # plt.plot(x + width, BENFORDLD, color='blue', linewidth=0.8)
+        if bl.results['P']<=bl.alpha:
+            title = title + "\nAnomalia detectada! P=%g, Tstat=%g" %(bl.results['P'], bl.results['t'])
+        else:
+            title = title + "\nNenhuma anomalia detectada. P=%g, Tstat=%g" %(bl.results['P'], bl.results['t'])
+        
+        # Add some text for labels, title and custom x-axis tick labels, etc.
+        fig.canvas.set_window_title('Porcentagem dos Primeiros Dígitos')
+        ax.set_title(title, fontsize=fontsize)
+        ax.set_ylabel('Frequência (%)', fontsize=fontsize)
+        ax.set_xlabel('Dígitos', fontsize=fontsize)
+        ax.set_xticks(x)
+        ax.set_xticklabels(x, fontsize=fontsize)
+        ax.grid(True)
+        ax.legend()
+        
+        # Hide the right and top spines & add legend
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.legend(prop={'size': 15}, frameon=False)
+        plt.savefig(path, format='jpg')
+        plt.show()
 
 
-class teste:
+class Teste:
 
     _total_count = _observed = _data_percentage = _expected = 0
 
