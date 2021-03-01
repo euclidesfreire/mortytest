@@ -9,17 +9,20 @@ from benfordslaw import benfordslaw
 
 class Morty:
 
-    def __init__(self, df):
+    def __init__(self):
         """
         df = dataset 
         bl = function benfords law 
         """
-
-        self.df = df
         self.bl = benfordslaw(alpha=0.5)
     
+    def dataframe(self, df):
+        self.df = df
+    
     def benford(self, column_name, title, path):
-        #New Deaths / benford
+        df = self.df
+        bl = self.bl
+        
         X = df[column_name].values
 
         result = bl.fit(X)
