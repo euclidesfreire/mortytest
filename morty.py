@@ -54,6 +54,18 @@ class Morty:
         df_new = pd.DataFrame(
             data = df_tmp, 
             columns = ['state', 'date', 'new_confirmed', 'new_deaths'])
+        
+        self._benford(
+            df_new['new_confirmed'], 
+            name, 
+            'Casos Confirmados - Soma dos dados por Dia', 
+            path)
+
+        self._benford(
+            df_new['new_deaths'], 
+            name, 
+            'Óbitos - Soma dos dados por Dia', 
+            path)
 
         #Create file csv 
         df_new.to_csv(path+name+'.csv')
