@@ -7,7 +7,7 @@ Introdução
 
 Estrutura:
 -----------
-* morty.py - Contém funções gerais
+* morty.py - Contém classe principal, Morty. E a classe de Test para Qui-Quadrado.
 * test.ipynb - Contém os testes dos datasets pela benfordslaw
 
 Tecnologias utilizadas:
@@ -22,6 +22,8 @@ Library:
  * numpy
  * matplotlib
  * seaborn
+ * math
+ * scipy.stats (chisquare)
  * benfordslaw
 
 Para contribuir
@@ -30,6 +32,18 @@ Para contribuir
     cd (Caminho do Diretório em que desejas clonar)
     git clone https://github.com/euclidesfreire/mortytest.git
     cd mortytest
+
+Instalação:
+-----------
+
+* Passo 1: 
+    - Instale as Bibliotecas Necessárias 
+
+* Passo 2:
+    - Criar pastas de Resultados
+        Na pasta "mortytest", entre pelo terminal e execute o seguinte comando:
+        (Lembre de ter permitido o arquivo ser executado)
+        - ./make_build.sh 
 
 
 - "Morty Test - Testar o que trouxe morte, pela certeza que precisamos."
