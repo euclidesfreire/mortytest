@@ -101,7 +101,9 @@ class Morty:
     
         title += 'Período: ' + periodo
 
-        self._benford(X, periodo, title, path)
+        name = column_name + '-' + periodo
+
+        self._benford(X, name, title, path)
 
 
     def delete_isnull_city(self, name, title, path):
