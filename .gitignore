@@ -138,6 +138,4 @@ dmypy.json
 cython_debug/
 
 #IMGs
-*.png
-*.jpg
-*.jpeg
+resultados/**/*.jpeg

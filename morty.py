@@ -14,23 +14,30 @@ class Morty:
         df = dataset 
         bl = function benfords law 
         """
-        self.bl = benfordslaw(alpha=0.5)
+        self._bl = benfordslaw(alpha=0.5)
     
     def dataframe(self, df):
-        self.df = df
+        self._df = df
     
     def benford(self, column_name, title, path):
-        df = self.df
-        bl = self.bl
+        df = self._df
+        bl = self._bl
         
         X = df[column_name].values
 
         result = bl.fit(X)
 
-        self.make_plot(path, title)
+        self.make_plot(path+column_name, title)
+    
+    def _benford(self, X, name, title, path):
+        bl = self._bl
+
+        result = bl.fit(X)
+
+        self.make_plot(path+name, title)
 
     def sum_data_date(self, name, path):
-        df_aux = self.df
+        df_aux = self._df
         df_tmp = []
     
         #Unificar os dados por estado
@@ -47,67 +54,90 @@ class Morty:
         df_new = pd.DataFrame(
             data = df_tmp, 
             columns = ['state', 'date', 'new_confirmed', 'new_deaths'])
+        
+        self._benford(
+            df_new['new_confirmed'], 
+            name+'-new_confirmed', 
+            'Casos Confirmados - Soma dos dados por Dia', 
+            path)
+
+        self._benford(
+            df_new['new_deaths'], 
+            name+'-new_deaths', 
+            'Óbitos - Soma dos dados por Dia', 
+            path)
 
         #Create file csv 
         df_new.to_csv(path+name+'.csv')
 
         return df_new
 
-    def all_estados_br(self, column_name, title, path):
-        df = self.df
-        bl = self.bl
-        state_aux = 'state'
+    def all_estados_br(self, column_name, title, var_state, path):
+        df = self._df
+        state_aux = var_state
 
         for state in df[state_aux].unique():
            
             Iloc = df[state_aux]==state
            
             X = df[column_name].loc[Iloc].values
-           
-            result = bl.fit(X)
-           
-            t = title + " - Estado: " + state 
-           
-            self.make_plot(path+column_name+'-'+state, t)
 
-    def por_periodo(self, column_name, title, time_start, time_stop, path):
-        df = self.df
-        bl = self.bl
-        date = 'date'
+            t = title + " - Estado: " + state 
+
+            name = column_name+'-'+state
+
+            self._benford(X, name, t, path)
+           
+
+    def por_periodo(self, column_name, title, data_name, time_start, time_stop, path):
+        df = self._df
     
-        Iloc = (df[date] >= time_start) & (df[date] <= time_stop)
+        Iloc = (df[data_name] >= time_start) & (df[data_name] <= time_stop)
     
         X = df[column_name].loc[Iloc].values
-    
-        result = bl.fit(X)
     
         periodo = time_start + ':' + time_stop 
     
         title += 'Período: ' + periodo
-    
-        self.make_plot(path+periodo, title)
 
-    def delete_isnull_city(self):
-        df = self.df
+        name = column_name + '-' + periodo
 
-        df_no_city_null = df
+        self._benford(X, name, title, path)
+
+
+    def delete_isnull_city(self, name, title, path):
+        df_no_city_null = self._df
+
         df_no_city_null.drop(df_no_city_null[df_no_city_null.city.isnull()].index,inplace=True)
+
+        self._benford(
+            df_no_city_null['new_confirmed'], 
+            name+'-new_confirmed', 
+            'Casos Confirmados - '+title, 
+            path)
+
+        self._benford(
+            df_no_city_null['new_deaths'], 
+            name+'-new_deaths', 
+            'Óbitos - '+title, 
+            path)
 
         return df_no_city_null
 
-    def heatmap(self, titleCor):
-        df = self.df
+    def heatmap(self, titleCor, path):
+        df = self._df
 
         dfCor = df.corr()
 
         outcomeCor = abs(dfCor[titleCor])
 
         plt.figure(figsize=(10,8))
+        plt.savefig(path+titleCor+'.jpeg', format='jpeg')
         sns.heatmap(dfCor,cmap='rocket_r',annot=True)
 
     #função de plot em Pt-BR da função de benford
     def make_plot(self, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8)):
-        bl = self.bl
+        bl = self._bl
         data_percentage = bl.results['percentage_emp']
         x = data_percentage[:, 0]
 
@@ -148,7 +178,7 @@ class Morty:
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
         ax.legend(prop={'size': 15}, frameon=False)
-        plt.savefig(path, format='jpg')
+        plt.savefig(path+'.jpeg', format='jpeg')
         plt.show()
 
 
@@ -156,7 +186,7 @@ class Teste:
 
     _total_count = _observed = _data_percentage = _expected = 0
 
-    def __init__(self, N, tabulated, alpha=0.05):
+    def __init__(self):
         """
         Parameters
         ----------
@@ -164,10 +194,15 @@ class Teste:
             Input data.
         """
 
+        self._N = 0
+        self._alpha = 0
+        self._tabulated = 0
+        
+    def init(self, N, tabulated, alpha=0.05):
         self._N = N
         self._alpha = alpha
         self._tabulated = tabulated
-        
+
     #função chisquare da biblioteca scipy
     def func_chisquare(self):
         x2 = chisquare(self._observed, f_exp=self._expected)
