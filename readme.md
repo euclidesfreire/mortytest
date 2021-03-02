@@ -40,9 +40,9 @@ Instalação:
     - Instale as Bibliotecas Necessárias 
 
 * Passo 2:
-    - Criar pastas de Resultados
+    - Criar pastas de "Resultados".
         Na pasta "mortytest", entre pelo terminal e execute o seguinte comando:
-        (Lembre de ter permitido o arquivo ser executado)
+        (Lembre-se de ter permitido o arquivo ser executado)
         - ./make_build.sh 
 
 
