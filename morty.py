@@ -57,13 +57,13 @@ class Morty:
         
         self._benford(
             df_new['new_confirmed'], 
-            name, 
+            name+'-new_confirmed', 
             'Casos Confirmados - Soma dos dados por Dia', 
             path)
 
         self._benford(
             df_new['new_deaths'], 
-            name, 
+            name+'-new_deaths', 
             'Óbitos - Soma dos dados por Dia', 
             path)
 
@@ -84,7 +84,9 @@ class Morty:
 
             t = title + " - Estado: " + state 
 
-            self._benford(X, column_name, t, path)
+            name = column_name+'-'+state
+
+            self._benford(X, name, t, path)
            
 
     def por_periodo(self, column_name, title, time_start, time_stop, path):
@@ -107,11 +109,21 @@ class Morty:
 
         df_no_city_null.drop(df_no_city_null[df_no_city_null.city.isnull()].index,inplace=True)
 
-        self.benford(name, title, path)
+        self._benford(
+            df_no_city_null['new_confirmed'], 
+            name+'-new_confirmed', 
+            'Casos Confirmados - '+title, 
+            path)
+
+        self._benford(
+            df_no_city_null['new_deaths'], 
+            name+'-new_deaths', 
+            'Óbitos - '+title, 
+            path)
 
         return df_no_city_null
 
-    def heatmap(self, titleCor):
+    def heatmap(self, titleCor, path):
         df = self._df
 
         dfCor = df.corr()
@@ -119,6 +131,7 @@ class Morty:
         outcomeCor = abs(dfCor[titleCor])
 
         plt.figure(figsize=(10,8))
+        plt.savefig(path+titleCor, format='jpeg')
         sns.heatmap(dfCor,cmap='rocket_r',annot=True)
 
     #função de plot em Pt-BR da função de benford
@@ -172,7 +185,7 @@ class Teste:
 
     _total_count = _observed = _data_percentage = _expected = 0
 
-    def __init__(self, N, tabulated, alpha=0.05):
+    def __init__(self):
         """
         Parameters
         ----------
@@ -180,10 +193,15 @@ class Teste:
             Input data.
         """
 
+        self._N = 0
+        self._alpha = 0
+        self._tabulated = 0
+        
+    def init(self, N, tabulated, alpha=0.05):
         self._N = N
         self._alpha = alpha
         self._tabulated = tabulated
-        
+
     #função chisquare da biblioteca scipy
     def func_chisquare(self):
         x2 = chisquare(self._observed, f_exp=self._expected)
