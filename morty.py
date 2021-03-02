@@ -72,9 +72,9 @@ class Morty:
 
         return df_new
 
-    def all_estados_br(self, column_name, title, path):
+    def all_estados_br(self, column_name, title, var_state, path):
         df = self._df
-        state_aux = 'state'
+        state_aux = var_state
 
         for state in df[state_aux].unique():
            
@@ -89,11 +89,10 @@ class Morty:
             self._benford(X, name, t, path)
            
 
-    def por_periodo(self, column_name, title, time_start, time_stop, path):
+    def por_periodo(self, column_name, title, data_name, time_start, time_stop, path):
         df = self._df
-        date = 'date'
     
-        Iloc = (df[date] >= time_start) & (df[date] <= time_stop)
+        Iloc = (df[data_name] >= time_start) & (df[data_name] <= time_stop)
     
         X = df[column_name].loc[Iloc].values
     
@@ -133,7 +132,7 @@ class Morty:
         outcomeCor = abs(dfCor[titleCor])
 
         plt.figure(figsize=(10,8))
-        plt.savefig(path+titleCor, format='jpeg')
+        plt.savefig(path+titleCor+'.jpeg', format='jpeg')
         sns.heatmap(dfCor,cmap='rocket_r',annot=True)
 
     #função de plot em Pt-BR da função de benford
@@ -179,7 +178,7 @@ class Morty:
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
         ax.legend(prop={'size': 15}, frameon=False)
-        plt.savefig(path, format='jpeg')
+        plt.savefig(path+'.jpeg', format='jpeg')
         plt.show()
 
 
