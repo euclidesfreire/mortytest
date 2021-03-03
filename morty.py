@@ -132,8 +132,8 @@ class Morty:
         outcomeCor = abs(dfCor[titleCor])
 
         plt.figure(figsize=(10,8))
-        plt.savefig(path+titleCor+'.jpeg', format='jpeg')
         sns.heatmap(dfCor,cmap='rocket_r',annot=True)
+        plt.savefig(path+titleCor+'.jpeg')
 
     #função de plot em Pt-BR da função de benford
     def make_plot(self, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8)):
