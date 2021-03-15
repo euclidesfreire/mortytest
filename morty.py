@@ -17,7 +17,7 @@ class Morty:
         self._bl = benfordslaw(alpha=alpha)
         self._df = ""
     
-    def dataframe(self, df_path, sep=','):
+    def add_dataframe(self, df_path, sep=','):
         df = pd.read_csv(df_path, sep=sep)
         self._df = df
     
@@ -27,6 +27,13 @@ class Morty:
         result = bl.fit(X)
 
         self.make_plot(path+name, title)
+    
+    def call_benford(self, column_name, title, path):
+        df = self._df
+        
+        X = df[column_name].values
+
+        self.benford(X, title, column_name, path)
 
     def sum_data_date(self, name, path):
         df_aux = self._df
