@@ -44,6 +44,8 @@ Instalação:
         Na pasta "mortytest", entre pelo terminal e execute o seguinte comando:
         (Lembre-se de ter permitido o arquivo ser executado)
         - ./make_build.sh 
+* Passo 3: 
+    - Abra o notebook "test", e execute todos os testes. 
 
 Licenças e Citações:
 ---------------------
