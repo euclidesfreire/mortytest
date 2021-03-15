@@ -9,27 +9,19 @@ from benfordslaw import benfordslaw
 
 class Morty:
 
-    def __init__(self):
+    def __init__(self, alpha=0.5):
         """
-        df = dataset 
-        bl = function benfords law 
+        _df = dataset 
+        _bl = function benfords law 
         """
-        self._bl = benfordslaw(alpha=0.5)
+        self._bl = benfordslaw(alpha=alpha)
+        self._df = ""
     
-    def dataframe(self, df):
+    def dataframe(self, df_path, sep=','):
+        df = pd.read_csv(df_path, sep=sep)
         self._df = df
     
-    def benford(self, column_name, title, path):
-        df = self._df
-        bl = self._bl
-        
-        X = df[column_name].values
-
-        result = bl.fit(X)
-
-        self.make_plot(path+column_name, title)
-    
-    def _benford(self, X, name, title, path):
+    def benford(self, X, title, name, path):
         bl = self._bl
 
         result = bl.fit(X)
@@ -55,16 +47,16 @@ class Morty:
             data = df_tmp, 
             columns = ['state', 'date', 'new_confirmed', 'new_deaths'])
         
-        self._benford(
+        self.benford(
             df_new['new_confirmed'], 
-            name+'-new_confirmed', 
             'Casos Confirmados - Soma dos dados por Dia', 
+            name+'-new_confirmed', 
             path)
 
-        self._benford(
+        self.benford(
             df_new['new_deaths'], 
-            name+'-new_deaths', 
-            'Óbitos - Soma dos dados por Dia', 
+            'Óbitos - Soma dos dados por Dia',
+            name+'-new_deaths',  
             path)
 
         #Create file csv 
@@ -86,7 +78,7 @@ class Morty:
 
             name = column_name+'-'+state
 
-            self._benford(X, name, t, path)
+            self.benford(X, t, name, path)
            
 
     def por_periodo(self, column_name, title, data_name, time_start, time_stop, path):
@@ -102,27 +94,7 @@ class Morty:
 
         name = column_name + '-' + periodo
 
-        self._benford(X, name, title, path)
-
-
-    def delete_isnull_city(self, name, title, path):
-        df_no_city_null = self._df
-
-        df_no_city_null.drop(df_no_city_null[df_no_city_null.city.isnull()].index,inplace=True)
-
-        self._benford(
-            df_no_city_null['new_confirmed'], 
-            name+'-new_confirmed', 
-            'Casos Confirmados - '+title, 
-            path)
-
-        self._benford(
-            df_no_city_null['new_deaths'], 
-            name+'-new_deaths', 
-            'Óbitos - '+title, 
-            path)
-
-        return df_no_city_null
+        self.benford(X, title, name, path)
 
     def heatmap(self, titleCor, path):
         df = self._df
