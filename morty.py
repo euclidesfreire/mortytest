@@ -17,10 +17,9 @@ class Morty:
         self._bl = benfordslaw(alpha=alpha)
         self._df = ""
     
-    def add_dataframe(self, df_path, sep=','):
-        df = pd.read_csv(df_path, sep=sep)
+    def add_df(self, df):
         self._df = df
-    
+
     def benford(self, X, title, name, path):
         bl = self._bl
 
@@ -34,42 +33,6 @@ class Morty:
         X = df[column_name].values
 
         self.benford(X, title, column_name, path)
-
-    def sum_data_date(self, name, path):
-        df_aux = self._df
-        df_tmp = []
-    
-        #Unificar os dados por estado
-        for state in df_aux['state'].unique():
-            Iloc = df_aux['state']==state
-
-            #Unificar os dados por dia
-            for date in df_aux['date'].loc[Iloc].unique():
-                new_confirmed_aux = df_aux['new_confirmed'].loc[df_aux['date']==date].sum()
-                new_deaths_aux = df_aux['new_deaths'].loc[df_aux['date']==date].sum()
-                df_tmp.append([state, date, new_confirmed_aux, new_deaths_aux])
-
-        #Create dataset
-        df_new = pd.DataFrame(
-            data = df_tmp, 
-            columns = ['state', 'date', 'new_confirmed', 'new_deaths'])
-        
-        self.benford(
-            df_new['new_confirmed'], 
-            'Casos Confirmados - Soma dos dados por Dia', 
-            name+'-new_confirmed', 
-            path)
-
-        self.benford(
-            df_new['new_deaths'], 
-            'Óbitos - Soma dos dados por Dia',
-            name+'-new_deaths',  
-            path)
-
-        #Create file csv 
-        df_new.to_csv(path+name+'.csv')
-
-        return df_new
 
     def all_estados_br(self, column_name, title, var_state, path):
         df = self._df
