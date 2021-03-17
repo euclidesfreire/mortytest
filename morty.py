@@ -9,68 +9,30 @@ from benfordslaw import benfordslaw
 
 class Morty:
 
-    def __init__(self):
+    def __init__(self, alpha=0.5):
         """
-        df = dataset 
-        bl = function benfords law 
+        _df = dataset 
+        _bl = function benfords law 
         """
-        self._bl = benfordslaw(alpha=0.5)
+        self._bl = benfordslaw(alpha=alpha)
+        self._df = ""
     
-    def dataframe(self, df):
+    def add_df(self, df):
         self._df = df
-    
-    def benford(self, column_name, title, path):
-        df = self._df
-        bl = self._bl
-        
-        X = df[column_name].values
 
-        result = bl.fit(X)
-
-        self.make_plot(path+column_name, title)
-    
-    def _benford(self, X, name, title, path):
+    def benford(self, X, title, name, path):
         bl = self._bl
 
         result = bl.fit(X)
 
         self.make_plot(path+name, title)
-
-    def sum_data_date(self, name, path):
-        df_aux = self._df
-        df_tmp = []
     
-        #Unificar os dados por estado
-        for state in df_aux['state'].unique():
-            Iloc = df_aux['state']==state
-
-            #Unificar os dados por dia
-            for date in df_aux['date'].loc[Iloc].unique():
-                new_confirmed_aux = df_aux['new_confirmed'].loc[df_aux['date']==date].sum()
-                new_deaths_aux = df_aux['new_deaths'].loc[df_aux['date']==date].sum()
-                df_tmp.append([state, date, new_confirmed_aux, new_deaths_aux])
-
-        #Create dataset
-        df_new = pd.DataFrame(
-            data = df_tmp, 
-            columns = ['state', 'date', 'new_confirmed', 'new_deaths'])
+    def call_benford(self, column_name, title, path):
+        df = self._df
         
-        self._benford(
-            df_new['new_confirmed'], 
-            name+'-new_confirmed', 
-            'Casos Confirmados - Soma dos dados por Dia', 
-            path)
+        X = df[column_name].values
 
-        self._benford(
-            df_new['new_deaths'], 
-            name+'-new_deaths', 
-            'Óbitos - Soma dos dados por Dia', 
-            path)
-
-        #Create file csv 
-        df_new.to_csv(path+name+'.csv')
-
-        return df_new
+        self.benford(X, title, column_name, path)
 
     def all_estados_br(self, column_name, title, var_state, path):
         df = self._df
@@ -86,7 +48,7 @@ class Morty:
 
             name = column_name+'-'+state
 
-            self._benford(X, name, t, path)
+            self.benford(X, t, name, path)
            
 
     def por_periodo(self, column_name, title, data_name, time_start, time_stop, path):
@@ -102,27 +64,7 @@ class Morty:
 
         name = column_name + '-' + periodo
 
-        self._benford(X, name, title, path)
-
-
-    def delete_isnull_city(self, name, title, path):
-        df_no_city_null = self._df
-
-        df_no_city_null.drop(df_no_city_null[df_no_city_null.city.isnull()].index,inplace=True)
-
-        self._benford(
-            df_no_city_null['new_confirmed'], 
-            name+'-new_confirmed', 
-            'Casos Confirmados - '+title, 
-            path)
-
-        self._benford(
-            df_no_city_null['new_deaths'], 
-            name+'-new_deaths', 
-            'Óbitos - '+title, 
-            path)
-
-        return df_no_city_null
+        self.benford(X, title, name, path)
 
     def heatmap(self, titleCor, path):
         df = self._df
