@@ -1,11 +1,12 @@
 #Library 
+from scipy.stats import chisquare
+from benfordslaw import benfordslaw
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import math
-from scipy.stats import chisquare
-from benfordslaw import benfordslaw
+import folium
 
 class Morty:
 
@@ -26,6 +27,8 @@ class Morty:
         result = bl.fit(X)
 
         self.make_plot(path+name, title)
+
+        return result
     
     def call_benford(self, column_name, title, path):
         df = self._df
@@ -122,7 +125,6 @@ class Morty:
         ax.legend(prop={'size': 15}, frameon=False)
         plt.savefig(path+'.jpeg', format='jpeg')
         plt.show()
-
 
 class Teste:
 
@@ -281,3 +283,24 @@ class Teste:
         ax.set_xticks(x)
         ax.legend()
         plt.show()
+
+
+def choropleth(df, url_geojson, columns, key_on, legend_name, fill_color='YlOrRd', location=[-15.8267, -47.9218], zoom_start=3):
+    # Carregar o arquivo json
+    state_geo = url_geojson
+    # Criar o mapa base
+    m = folium.Map(location=location, zoom_start=zoom_start)
+    #Criar a camada Choroplet
+    folium.Choropleth(
+        geo_data=state_geo,
+        name='choropleth',
+        data=df,
+        columns=columns,
+        key_on=key_on,
+        fill_color=fill_color,
+        fill_opacity=0.7,
+        line_opacity=0.2,
+        legend_name=legend_name
+    ).add_to(m)
+    # Visualizar
+    m
