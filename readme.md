@@ -25,6 +25,7 @@ Library:
  * math
  * scipy.stats (chisquare)
  * benfordslaw
+ * folium
 
 Para contribuir
 ----------------------------

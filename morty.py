@@ -10,7 +10,7 @@ import folium
 
 class Morty:
 
-    def __init__(self, alpha=0.5):
+    def __init__(self, alpha=0.05):
         """
         _df = dataset 
         _bl = function benfords law 
@@ -22,9 +22,7 @@ class Morty:
         self._df = df
 
     def benford(self, X, title, name, path):
-        bl = self._bl
-
-        result = bl.fit(X)
+        result = self._bl.fit(X)
 
         self.make_plot(path+name, title)
 
@@ -40,10 +38,11 @@ class Morty:
     def all_estados_br(self, column_name, title, var_state, path):
         df = self._df
         state_aux = var_state
+        result_por_state = {}
 
         for state in df[state_aux].unique():
            
-            Iloc = df[state_aux]==state
+            Iloc = (df[state_aux]==state)
            
             X = df[column_name].loc[Iloc].values
 
@@ -51,7 +50,11 @@ class Morty:
 
             name = column_name+'-'+state
 
-            self.benford(X, t, name, path)
+            result = self.benford(X, t, name, path)
+
+            result_por_state[state] = {'p': result['P'], 't': result['t']}
+        
+        return result_por_state
            
 
     def por_periodo(self, column_name, title, data_name, time_start, time_stop, path):
@@ -158,7 +161,7 @@ class Teste:
 
        self._expected = self._get_expected_counts()
 
-       return self._chi_square_test()
+       return [self._chi_square_test(), self._expected, self._total_count, self._observed, self._data_percentage]
 
     def _count_first_digit(self):
         N = self._N
@@ -223,11 +226,11 @@ class Teste:
 
         index = [i + 1 for i in range(len(data_pct))]  
 
-        fig.canvas.set_window_title('Percentage First Digits')
+        fig.canvas.set_window_title('Porcentagem do Primeiro Dígito')
 
-        ax.set_title('Data vs. Benford Values', fontsize=15)
+        ax.set_title('Dados vs. Valor de Benford', fontsize=15)
 
-        ax.set_ylabel('Frequency (%)', fontsize=16)
+        ax.set_ylabel('Frequência (%)', fontsize=16)
 
         ax.set_xticks(index)
 
@@ -278,21 +281,32 @@ class Teste:
         rects1 = ax.bar(x - width, data_pct, width=0.95, color='black', label='Data')
         rects2 = ax.bar(x + width, BENFORD,width,label='Benford')
         # Add some text for labels, title and custom x-axis tick labels, etc.
-        ax.set_ylabel('Frequency (%)', fontsize=16)
+        ax.set_ylabel('Frequência (%)', fontsize=16)
         ax.set_title('Benford')
         ax.set_xticks(x)
         ax.legend()
         plt.show()
 
 
-def choropleth(df, url_geojson, columns, key_on, legend_name, fill_color='YlOrRd', location=[-15.8267, -47.9218], zoom_start=3):
-    # Carregar o arquivo json
-    state_geo = url_geojson
+def choropleth(
+    df, 
+    url_geojson, 
+    columns, 
+    key_on, 
+    legend_name, 
+    fill_color='YlOrRd', 
+    location=[-15.8267, -47.9218], 
+    zoom_start=3, 
+    fill_opacity=0.7,
+    line_opacity=0.2
+    ):
+
     # Criar o mapa base
     m = folium.Map(location=location, zoom_start=zoom_start)
+
     #Criar a camada Choroplet
     folium.Choropleth(
-        geo_data=state_geo,
+        geo_data=url_geojson,
         name='choropleth',
         data=df,
         columns=columns,
@@ -303,4 +317,4 @@ def choropleth(df, url_geojson, columns, key_on, legend_name, fill_color='YlOrRd
         legend_name=legend_name
     ).add_to(m)
     # Visualizar
-    m
+    return m
