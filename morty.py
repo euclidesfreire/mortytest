@@ -66,7 +66,7 @@ class Morty:
     
         periodo = time_start + ':' + time_stop 
     
-        title += 'Período: ' + periodo
+        title += ' Período: ' + periodo
 
         name = column_name + '-' + periodo
 
@@ -217,7 +217,7 @@ class Teste:
 
         return x2, compare
 
-    def bar_chart(self):
+    def bar_chart(self,title):
 
         data_pct = self._data_percentage
         BENFORD = self._benford()
@@ -228,7 +228,7 @@ class Teste:
 
         fig.canvas.set_window_title('Porcentagem do Primeiro Dígito')
 
-        ax.set_title('Dados vs. Valor de Benford', fontsize=15)
+        ax.set_title(title, fontsize=15)
 
         ax.set_ylabel('Frequência (%)', fontsize=16)
 
@@ -239,7 +239,7 @@ class Teste:
 
         # build bars    
 
-        rects = ax.bar(index, data_pct, width=0.95, color='black', label='Data')
+        rects = ax.bar(index, data_pct, width=0.95, color='black', label='Dados')
 
 
         # attach a text label above each bar displaying its height
@@ -278,11 +278,11 @@ class Teste:
         x = np.arange(len(data_pct)) # the label locations
         width = 0.35  # the width of the bars
         fig, ax = plt.subplots()
-        rects1 = ax.bar(x - width, data_pct, width=0.95, color='black', label='Data')
+        rects1 = ax.bar(x - width, data_pct, width=0.95, color='black', label='Dados')
         rects2 = ax.bar(x + width, BENFORD,width,label='Benford')
         # Add some text for labels, title and custom x-axis tick labels, etc.
         ax.set_ylabel('Frequência (%)', fontsize=16)
-        ax.set_title('Benford')
+        ax.set_title(title)
         ax.set_xticks(x)
         ax.legend()
         plt.show()
