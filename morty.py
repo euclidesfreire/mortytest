@@ -84,7 +84,7 @@ class Morty:
         plt.savefig(path+titleCor+'.jpeg')
 
     #função de plot em Pt-BR da função de benford
-    def make_plot(self, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8)):
+    def make_plot(self, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8), label_Empirical='Distribuição Empírica', ylabel='Frequência (%)', xlabel='Dígitos'):
         bl = self._bl
         data_percentage = bl.results['percentage_emp']
         x = data_percentage[:, 0]
@@ -93,7 +93,7 @@ class Morty:
         fig, ax = plt.subplots(figsize=figsize)
 
         # Plot Empirical percentages
-        rects1 = ax.bar(x, data_percentage[:, 1], width=barwidth, color=barcolor, alpha=0.8, label='Distribuição Empírica')
+        rects1 = ax.bar(x, data_percentage[:, 1], width=barwidth, color=barcolor, alpha=0.8, label=label_Empirical)
         plt.plot(x, data_percentage[:, 1], color='black', linewidth=0.8)
 
         # ax.scatter(x, data_percentage, s=150, c='red', zorder=2)
@@ -108,15 +108,15 @@ class Morty:
         # ax.bar(x + width, BENFORDLD, width=width, color='blue', alpha=0.8, label='Benfords distribution')
         # plt.plot(x + width, BENFORDLD, color='blue', linewidth=0.8)
         if bl.results['P']<=bl.alpha:
-            title = title + "\nAnomalia detectada! P=%g, Tstat=%g" %(bl.results['P'], bl.results['t'])
+            title = title + "\nAnomalia detectada! P=%g, X²=%g" %(bl.results['P'], bl.results['t'])
         else:
-            title = title + "\nNenhuma anomalia detectada. P=%g, Tstat=%g" %(bl.results['P'], bl.results['t'])
+            title = title + "\nNenhuma anomalia detectada. P=%g, X²=%g" %(bl.results['P'], bl.results['t'])
         
         # Add some text for labels, title and custom x-axis tick labels, etc.
         fig.canvas.set_window_title('Porcentagem dos Primeiros Dígitos')
         ax.set_title(title, fontsize=fontsize)
-        ax.set_ylabel('Frequência (%)', fontsize=fontsize)
-        ax.set_xlabel('Dígitos', fontsize=fontsize)
+        ax.set_ylabel(ylabel, fontsize=fontsize)
+        ax.set_xlabel(xlabel, fontsize=fontsize)
         ax.set_xticks(x)
         ax.set_xticklabels(x, fontsize=fontsize)
         ax.grid(True)
