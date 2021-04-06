@@ -21,21 +21,19 @@ class Morty:
     def add_df(self, df):
         self._df = df
 
-    def benford(self, X, title, name, path):
+    def benford(self, X):
         result = self._bl.fit(X)
-
-        self.make_plot(path+name, title)
 
         return result
     
-    def call_benford(self, column_name, title, path):
-        df = self._df
-        
-        X = df[column_name].values
+    def call_benford(self, column_name):       
+        X = self._df[column_name].values
 
-        self.benford(X, title, column_name, path)
+        result = self.benford(X)
 
-    def all_estados_br(self, column_name, title, var_state, path):
+        return result
+
+    def all_estados_br(self, column_name, title, var_state, label_Empirical, path):
         df = self._df
         state_aux = var_state
         result_por_state = {}
@@ -50,16 +48,18 @@ class Morty:
 
             name = column_name+'-'+state
 
-            result = self.benford(X, t, name, path)
+            result = self.benford(X)
+
+            self.make_plot(path+name, title=t, label_Empirical=label_Empirical)
 
             result_por_state[state] = {'p': result['P'], 't': result['t']}
         
         return result_por_state
            
 
-    def por_periodo(self, column_name, title, data_name, time_start, time_stop, path):
+    def por_periodo(self, column_name, title, data_name, time_start, time_stop, label_Empirical, path):
         df = self._df
-    
+
         Iloc = (df[data_name] >= time_start) & (df[data_name] <= time_stop)
     
         X = df[column_name].loc[Iloc].values
@@ -70,7 +70,12 @@ class Morty:
 
         name = column_name + '-' + periodo
 
-        self.benford(X, title, name, path)
+        result = self.benford(X)
+
+        self.make_plot(path+name, title=title, label_Empirical=label_Empirical)
+
+        return result
+
 
     def heatmap(self, titleCor, path):
         df = self._df
@@ -83,8 +88,8 @@ class Morty:
         sns.heatmap(dfCor,cmap='rocket_r',annot=True)
         plt.savefig(path+titleCor+'.jpeg')
 
-    #função de plot em Pt-BR da função de benford
-    def make_plot(self, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8), label_Empirical='Distribuição Empírica', ylabel='Frequência (%)', xlabel='Dígitos'):
+    #função de plot em Pt-BR da função de benfordslaw
+    def make_plot(self, path, title='', fontsize=16, barcolor='black', barwidth=0.3, figsize=(15, 8), label_Empirical='Distribuição Empírica', ylabel='Frequências (%)', xlabel='Primeiro Dígito'):
         bl = self._bl
         data_percentage = bl.results['percentage_emp']
         x = data_percentage[:, 0]
