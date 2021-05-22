@@ -34,11 +34,12 @@ folders_resultados(){
     foldersArray[9]="resultados/plots/minsaude/estados/confirmados"
     foldersArray[10]="resultados/plots/minsaude/estados/obitos"
     foldersArray[11]="resultados/plots/minsaude/periodos"
+    foldersArray[11]="resultados/plots/minsaude/regiao"
     foldersArray[12]="resultados/plots/regcivil"
+    foldersArray[13]="resultados/plots/regcivil/faixaetaria"
+    foldersArray[13]="resultados/plots/regcivil/tipodedoenca"
     foldersArray[13]="resultados/plots/regcivil/estados"
-    foldersArray[14]="resultados/plots/regcivil/estados/confirmados"
-    foldersArray[15]="resultados/plots/regcivil/estados/obitos"
-    foldersArray[16]="resultados/plots/regcivil/periodos"
+    foldersArray[14]="resultados/plots/regcivil/estados/obitos"
 
     for i in "${foldersArray[@]}"; do 
        create_folders_resultados $i

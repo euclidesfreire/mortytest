@@ -33,7 +33,7 @@ class Morty:
 
         return result
 
-    def all_estados_br(self, column_name, title, var_state, label_Empirical, path):
+    def all_estados_br(self, column_name, title, var_state, label_Empirical, path, fontsize=20):
         df = self._df
         state_aux = var_state
         result_por_state = {}
@@ -50,7 +50,7 @@ class Morty:
 
             result = self.benford(X)
 
-            self.make_plot(path+name, title=t, label_Empirical=label_Empirical)
+            self.make_plot(path+name, title=t, fontsize=fontsize, label_Empirical=label_Empirical)
 
             result_por_state[state] = {'p': result['P'], 't': result['t']}
         
@@ -112,10 +112,13 @@ class Morty:
        
         # ax.bar(x + width, BENFORDLD, width=width, color='blue', alpha=0.8, label='Benfords distribution')
         # plt.plot(x + width, BENFORDLD, color='blue', linewidth=0.8)
+        P_result = str(round(bl.results['P'],4)).replace(".", ",")
+        T_result = str(round(bl.results['t'],4)).replace(".", ",")
+    
         if bl.results['P']<=bl.alpha:
-            title = title + "\nAnomalia detectada! P=%g, X²=%g" %(bl.results['P'], bl.results['t'])
+            title = title + "\nAnomalia detectada! P=" + P_result + ", X²=" + T_result
         else:
-            title = title + "\nNenhuma anomalia detectada. P=%g, X²=%g" %(bl.results['P'], bl.results['t'])
+            title = title + "\nNenhuma anomalia detectada. P=" + P_result + ", X²=" + T_result
         
         # Add some text for labels, title and custom x-axis tick labels, etc.
         fig.canvas.set_window_title('Porcentagem dos Primeiros Dígitos')
@@ -134,7 +137,7 @@ class Morty:
         plt.savefig(path+'.jpeg', format='jpeg')
         plt.show()
 
-class Teste:
+class Benfords_Law_Two:
 
     _total_count = _observed = _data_percentage = _expected = 0
 
